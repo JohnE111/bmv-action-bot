@@ -1,5 +1,7 @@
 import { Redis } from "@upstash/redis";
 const kv = Redis.fromEnv();
+import { Client as QStash } from "@upstash/qstash";
+const qstash = new QStash({ token: process.env.QSTASH_TOKEN });
 import {
   verifySlackSignature,
   postSlackMessage,
@@ -59,21 +61,10 @@ async function handleTranscriptSubmit(payload) {
     { type: "context", elements: [{ type: "mrkdwn", text: `⏳ Analyzing *${meetingTitle}*...` }] },
   ]);
 
-  const baseUrl = "https://bmv-action-bot.vercel.app";
-
-  await fetch(`${baseUrl}/api/slack/analyze`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-internal-secret": process.env.INTERNAL_SECRET || "bmv-internal-2026",
-    },
-    body: JSON.stringify({
-      transcript,
-      meetingTitle,
-      userId,
-      target,
-      thinkingTs: thinkingMsg.ts,
-    }),
+  await qstash.publishJSON({
+    url: "https://bmv-action-bot.vercel.app/api/slack/analyze",
+    headers: { "x-internal-secret": process.env.INTERNAL_SECRET || "bmv-internal-2026" },
+    body: { transcript, meetingTitle, userId, target, thinkingTs: thinkingMsg.ts },
   });
 }
 
