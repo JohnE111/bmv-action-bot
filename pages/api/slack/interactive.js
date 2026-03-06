@@ -166,6 +166,15 @@ async function handleEditOpen(payload, action) {
         },
       },
       {
+        type: "input", block_id: "edit_time", optional: true,
+        label: { type: "plain_text", text: "Time (optional)" },
+        hint: { type: "plain_text", text: "Leave blank to create an all-day event" },
+        element: {
+          type: "timepicker", action_id: "time_input",
+          placeholder: { type: "plain_text", text: "Pick a time" },
+        },
+      },
+      {
         type: "input", block_id: "edit_priority",
         label: { type: "plain_text", text: "Priority" },
         element: {
@@ -203,10 +212,11 @@ async function handleEditSubmit(payload) {
   const { channel, messageTs, index, meetingTitle } = JSON.parse(payload.view.private_metadata);
   const v = payload.view.state.values;
 
-  const updatedItem = {
+ const updatedItem = {
     task:     v.edit_task?.task_input?.value,
     assignee: v.edit_assignee?.assignee_input?.selected_option?.value,
     dueDate:  v.edit_due?.due_input?.selected_date || null,
+    dueTime:  v.edit_time?.time_input?.selected_time || null,
     priority: (v.edit_priority?.priority_input?.selected_option?.value || "Medium").toLowerCase(),
     client:   v.edit_client?.client_input?.value || null,
     notes:    v.edit_notes?.notes_input?.value || null,
