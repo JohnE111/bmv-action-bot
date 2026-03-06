@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "pages/api/slack/interactive.js": {
+      "maxDuration": 60
+    }
+  }
+}
