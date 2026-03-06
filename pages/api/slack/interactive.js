@@ -29,10 +29,10 @@ export default async function handler(req, res) {
   const params = new URLSearchParams(rawBody);
   const payload = JSON.parse(params.get("payload"));
 
-  if (payload.type === "view_submission") {
-    if (payload.view?.callback_id === "transcript_modal") await handleTranscriptSubmit(payload);
-    if (payload.view?.callback_id === "edit_modal") await handleEditSubmit(payload);
+ if (payload.type === "view_submission") {
     res.status(200).end();
+    if (payload.view?.callback_id === "transcript_modal") handleTranscriptSubmit(payload).catch(console.error);
+    if (payload.view?.callback_id === "edit_modal") handleEditSubmit(payload).catch(console.error);
     return;
   }
 
