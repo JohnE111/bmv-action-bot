@@ -1,5 +1,4 @@
 import { Redis } from "@upstash/redis";
-import { waitUntil } from "@vercel/functions";
 const kv = Redis.fromEnv();
 import {
   verifySlackSignature,
@@ -61,7 +60,7 @@ async function handleTranscriptSubmit(payload) {
 
   const baseUrl = "https://bmv-action-bot.vercel.app";
 
-  waitUntil(fetch(`${baseUrl}/api/slack/analyze`, {
+  await fetch(`${baseUrl}/api/slack/analyze`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -74,8 +73,8 @@ async function handleTranscriptSubmit(payload) {
       target,
       thinkingTs: thinkingMsg.ts,
     }),
-  }));
-  }
+  });
+}
 
 async function handleAccept(payload, action) {
   const userId = payload.user.id;
