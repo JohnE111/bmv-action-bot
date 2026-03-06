@@ -29,13 +29,14 @@ export default async function handler(req, res) {
   const params = new URLSearchParams(rawBody);
   const payload = JSON.parse(params.get("payload"));
 
-  res.status(200).end(); // Always respond immediately
-
   if (payload.type === "view_submission") {
     if (payload.view?.callback_id === "transcript_modal") await handleTranscriptSubmit(payload);
     if (payload.view?.callback_id === "edit_modal") await handleEditSubmit(payload);
+    res.status(200).end();
     return;
   }
+
+  res.status(200).end();
 
   if (payload.type === "block_actions") {
     const action = payload.actions[0];
