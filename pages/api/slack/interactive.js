@@ -58,24 +58,22 @@ async function handleTranscriptSubmit(payload) {
     { type: "context", elements: [{ type: "mrkdwn", text: `⏳ Analyzing *${meetingTitle}*...` }] },
   ]);
 
-  try {
-    const items = await extractActionItems(transcript, meetingTitle);
+  const baseUrl = "https://bmv-action-bot.vercel.app";
 
-    if (!items || items.length === 0) {
-      await updateSlackMessage(target, thinkingMsg.ts, [
-        { type: "section", text: { type: "mrkdwn", text: "🤔 No action items found. Try a more detailed transcript." } },
-      ]);
-      return;
-    }
-
-    const blocks = buildActionItemsMessage(items, meetingTitle, userId);
-    await updateSlackMessage(target, thinkingMsg.ts, blocks, `${items.length} action items from ${meetingTitle}`);
-  } catch (err) {
-    console.error(err);
-    await updateSlackMessage(target, thinkingMsg.ts, [
-      { type: "section", text: { type: "mrkdwn", text: `❌ Analysis failed: ${err.message}` } },
-    ]);
-  }
+  fetch(`${baseUrl}/api/slack/analyze`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-internal-secret": process.env.INTERNAL_SECRET || "bmv-internal-2026",
+    },
+    body: JSON.stringify({
+      transcript,
+      meetingTitle,
+      userId,
+      target,
+      thinkingTs: thinkingMsg.ts,
+    }),
+  }).catch(console.error);
 }
 
 async function handleAccept(payload, action) {
